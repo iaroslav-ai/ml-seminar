@@ -16,7 +16,6 @@ y = Xy[:, -1]
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, random_state=0)
 
-#model = SVR(C=0.6, gamma=0.01)
 # example pipeline
 model = make_pipeline(
     make_pipeline(
@@ -26,42 +25,25 @@ model = make_pipeline(
     SVR()
 )
 
+# print the parameters of the model
 print(model.get_params())
 
+# set the parameters of the pipeline
 model.set_params(
     pipeline__standardscaler__with_std=False,
     svr__C=0.1
 )
 
+# fit all the transformers and estimators in the pipeline
 model.fit(X_train, y_train)
-print(model.predict(X))
-print(model.score(X_test, y_test))
 
+# save the model
 import pickle as pc
 pc.dump(model, open('model.bin', 'wb'))
 
+# load the model (possibly in a different module)
 model = pc.load(open('model.bin', 'rb'))
+
+# make predictions with the model and estimate the quality of the model
+print(model.predict(X))
 print(model.score(X_test, y_test))
-
-
-"""
-sc = StandardScaler()
-sc.fit(X_train)
-X_train = sc.transform(X_train)
-
-sc2 = RobustScaler()
-sc2.fit(X_train)
-X_train = sc2.transform(X_train)
-
-from sklearn.metrics import r2_score
-
-# Regressors: score range in [-Inf, 1.0]
-print(model.score(X_train, y_train))
-
-yp = model.predict(X_train)
-print(r2_score(y_train, yp))
-
-print(model.score(sc.transform(X_val), y_val))
-print(model.score(sc.transform(X_test), y_test))
-"""
-
