@@ -74,8 +74,7 @@ estimator = set_grid(
         ),
     ],
     scaler=[
-        StandardScaler(),
-        RobustScaler(),
+        StandardScaler()
     ]
 )
 
