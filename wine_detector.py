@@ -1,6 +1,8 @@
 import pandas as pd
-from sklearn.svm import SVR
-from sklearn.model_selection import train_test_split
+from sklearn.svm import SVR, LinearSVR
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler, RobustScaler
 from sklearn.pipeline import make_pipeline
 import numpy as np
@@ -14,36 +16,29 @@ y = Xy[:, -1]
 
 # random split
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
-X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, random_state=0)
 
 # example pipeline
 model = make_pipeline(
-    make_pipeline(
-        StandardScaler(with_std=False),
-        RobustScaler()
-    ),
+    StandardScaler(),
     SVR()
 )
-
 # print the parameters of the model
 print(model.get_params())
 
-# set the parameters of the pipeline
-model.set_params(
-    pipeline__standardscaler__with_std=False,
-    svr__C=0.1
+gsearch = GridSearchCV(
+    estimator=model,
+    param_grid={
+        "svr__C": np.logspace(-6, 6, num=20),
+    },
+    verbose=1,
+    cv=3,
+    n_jobs=-1
 )
-
 # fit all the transformers and estimators in the pipeline
-model.fit(X_train, y_train)
+gsearch.fit(X_train, y_train)
+print(gsearch.score(X_test, y_test))
 
-# save the model
-import pickle as pc
-pc.dump(model, open('model.bin', 'wb'))
-
-# load the model (possibly in a different module)
-model = pc.load(open('model.bin', 'rb'))
-
-# make predictions with the model and estimate the quality of the model
-print(model.predict(X))
-print(model.score(X_test, y_test))
+for i in range(10):
+    ip = [X_test[i]]
+    y_true = y_test[i]
+    print(gsearch.predict(ip), y_true)
