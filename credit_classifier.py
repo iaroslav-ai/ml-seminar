@@ -9,6 +9,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import make_pipeline, make_union
 
+
 # selects a single column from the dataset
 class ColumnSelector(BaseEstimator, TransformerMixin):
     def __init__(self, index=0):
@@ -19,6 +20,7 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         return X[:, [self.index]]
+
 
 # one hot encodes
 class OneHotEncoder(BaseEstimator, TransformerMixin):
