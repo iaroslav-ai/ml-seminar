@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
 
-data = pd.read_csv('data/lumber.csv').as_matrix()
+data = pd.read_csv('lumber.csv').as_matrix()
 data = data[::-1]
 
 data = data[-1000:]
 
 Ix = np.array([0, 1, 2, 3, 4, 5])
-Iy = np.array([8])
+Iy = np.array([6])
 
 X, Y = [], []
 
@@ -60,4 +60,23 @@ final = estimator.steps[-1][-1]
 if isinstance(final, LinearSVC):
     weights = final.coef_
     print(np.reshape(weights, X_test[0].shape))
+
+from sklearn.model_selection import permutation_test_score
+
+score, permutation_scores, pvalue = permutation_test_score(
+    estimator, X, Y,
+    scoring="accuracy",
+    n_permutations=100,
+    n_jobs=-1,
+    verbose=1
+)
+
+import matplotlib.pyplot as plt
+
+print(pvalue)
+
+plt.hist(permutation_scores)
+plt.xlabel('Scores')
+plt.ylabel('Counts')
+plt.show()
 
